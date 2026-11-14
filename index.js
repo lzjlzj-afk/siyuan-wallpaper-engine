@@ -12,7 +12,7 @@ const DEFAULTS = {
   fit: "cover",
   fps: 30,
   dpr: 1.5,
-  opacity: 0.9,
+  opacity: 0.65,
   scrim: 0.25,
   blur: 18,
   glass: 0.55,
@@ -100,11 +100,12 @@ class WallpaperEnginePlugin extends Plugin {
 
   async loadAssets() {
     const base = `/plugins/${this.name}`;
+    const bust = `?v=${Date.now()}`;
     if (!document.getElementById("wpgl-style")) {
       const link = document.createElement("link");
       link.id = "wpgl-style";
       link.rel = "stylesheet";
-      link.href = `${base}/index.css`;
+      link.href = `${base}/index.css${bust}`;
       document.head.appendChild(link);
       await new Promise((resolve) => {
         link.onload = resolve;
@@ -122,7 +123,7 @@ class WallpaperEnginePlugin extends Plugin {
       if (loaded()) continue;
       await new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = `${base}/${rel}`;
+        s.src = `${base}/${rel}${bust}`;
         s.onload = resolve;
         s.onerror = () => reject(new Error(`无法加载 ${rel}，请确认插件文件完整`));
         document.head.appendChild(s);
