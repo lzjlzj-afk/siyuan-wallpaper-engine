@@ -1,0 +1,31 @@
+{
+  "name": "siyuan-wallpaper-engine",
+  "author": "lzjlzj-afk",
+  "url": "https://github.com/lzjlzj-afk/siyuan-wallpaper-engine",
+  "version": "0.1.0",
+  "minAppVersion": "3.5.0",
+  "backends": [
+    "windows",
+    "linux",
+    "darwin"
+  ],
+  "frontends": [
+    "desktop",
+    "desktop-window"
+  ],
+  "displayName": {
+    "en_US": "Wallpaper Engine",
+    "zh_CN": "壁纸引擎"
+  },
+  "description": {
+    "en_US": "Play your local Wallpaper Engine wallpapers as a live SiYuan background: scene.pkg rendered in real time with WebGL2, videos and web wallpapers supported, with liquid-glass UI controls.",
+    "zh_CN": "把 Wallpaper Engine 本地壁纸变成思源笔记的实时背景：scene.pkg 用 WebGL2 实时渲染，支持视频与网页壁纸，附毛玻璃外观、壁纸属性与自动轮播。"
+  },
+  "readme": {
+    "en_US": "README.md",
+    "zh_CN": "README_zh_CN.md"
+  },
+  "funding": {
+    "custom": []
+  }
+}

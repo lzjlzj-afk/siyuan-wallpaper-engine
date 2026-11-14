@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN" data-theme-mode="dark">
+<head>
+<meta charset="utf-8" />
+<title>壁纸引擎 · UI harness</title>
+<link rel="stylesheet" href="/index.css" />
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d12; font-family: "Microsoft YaHei", system-ui, sans-serif; }
+  #fake-si { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; color: #e6edf7; }
+  #fake-toolbar { height: 42px; background: rgba(255,255,255,.08); backdrop-filter: blur(18px); display: flex; align-items: center; padding: 0 16px; font-size: 12px; }
+  #fake-body { flex: 1; display: flex; }
+  #fake-dock { width: 240px; background: rgba(255,255,255,.06); backdrop-filter: blur(18px); padding: 16px; font-size: 12px; }
+  #fake-editor { flex: 1; padding: 40px 60px; }
+  #fake-editor h1 { font-size: 26px; margin: 0 0 18px; }
+  #fake-editor p { background: rgba(255,255,255,.14); border-radius: 10px; padding: 10px 12px; line-height: 1.9; font-size: 14px; }
+  #statusbar { position: fixed; left: 0; right: 0; bottom: 0; height: 26px; background: rgba(255,255,255,.06); backdrop-filter: blur(18px); font-size: 11px; display:flex; align-items:center; padding: 0 12px; color:#9aa4b2; z-index: 2; }
+</style>
+</head>
+<body class="fn__flex-column">
+<div id="fake-si">
+  <div id="fake-toolbar">思源笔记 · 壁纸引擎预览（模拟界面）</div>
+  <div id="fake-body">
+    <div id="fake-dock">文档树<br />· 思源壁纸引擎<br />· 场景壁纸渲染<br />· 毛玻璃外观</div>
+    <div id="fake-editor">
+      <h1>思源壁纸引擎</h1>
+      <p>这是一段模拟的思源正文，用来检查壁纸背景上的可读性。场景壁纸由 WebWallGL 用 WebGL2 实时渲染，粒子、图层与脚本都会运行。</p>
+      <p>面板里可以切换壁纸、调不透明度、暗角、毛玻璃模糊与玻璃浓度，也可以给当前场景壁纸调它自带的属性。</p>
+      <p>文字下方是半透明卡片，配合暗角，保证在白底壁纸上也能读清。</p>
+    </div>
+  </div>
+</div>
+<div id="statusbar">已同步 · 8 张壁纸</div>
+
+<script src="/lib/webwallgl.global.min.js"></script>
+<script src="/lib/wp-core.js"></script>
+<script src="/lib/wp-ui.js"></script>
+<script>
+const settings = {
+  lastId: null, fit: "cover", fps: 30, dpr: 1.5, opacity: 0.92, scrim: 0.28,
+  blur: 18, glass: 0.55, veil: 0.28, transparentUI: true, pauseOnBlur: true, scripts: true,
+  rotate: 0, dirs: [], props: {},
+};
+let items = [], currentId = null, inst = null, paused = false;
+const stage = document.createElement("div");
+stage.id = "wpgl-stage";
+const scrim = document.createElement("div");
+scrim.id = "wpgl-scrim";
+const bg = document.createElement("div");
+bg.id = "wpgl-bg";
+bg.append(stage, scrim);
+document.body.insertBefore(bg, document.body.firstChild);
+document.documentElement.classList.add("wpgl-on");
+
+async function mountItem(item) {
+  if (inst) { try { inst.destroy({ releasePkgCache: true }); } catch (e) {} inst = null; }
+  stage.innerHTML = "";
+  const base = `/wp/${encodeURIComponent(item.id)}`;
+  let source;
+  if (item.type === "scene") {
+    const res = await fetch(`${base}/${encodeURIComponent(item.pkgName)}`);
+    const ab = await res.arrayBuffer();
+    source = WebWallGL.bytesSource(ab, item.project, item.id);
+  } else {
+    source = WebWallGL.mediaSource(`${base}/${encodeURIComponent(item.fileName)}`, { type: item.type });
+  }
+  inst = await WebWallGL.mount(stage, { source, fit: settings.fit, fps: 30, renderDpr: 1.5, autoplay: true, volume: 0, scripts: true, mountTimeoutMs: 150000 });
+  currentId = item.id;
+  settings.lastId = item.id;
+  ui.syncFooter();
+}
+
+const ctrl = {
+  get settings() { return settings; },
+  get items() { return items; },
+  get currentId() { return currentId; },
+  get paused() { return paused; },
+  serverUrl: "/wp",
+  version: "0.1.0",
+  async play(id) { const it = items.find((x) => x.id === id); if (it) await mountItem(it); },
+  stop() { if (inst) { inst.destroy({ releasePkgCache: true }); inst = null; } currentId = null; stage.innerHTML = ""; },
+  togglePause() { if (!inst) return; if (paused) { inst.resume(); paused = false; } else { inst.pause(); paused = true; } },
+  saveSettings() {},
+  async refresh() {},
+  async addDir() { return true; },
+  applySettings(key) {
+    if (["opacity", "scrim", "blur", "glass", "veil", "transparentUI"].includes(key)) {
+      document.documentElement.style.setProperty("--wpgl-scrim", settings.scrim);
+      document.documentElement.style.setProperty("--wpgl-blur", settings.blur + "px");
+      document.documentElement.style.setProperty("--wpgl-glass", settings.glass);
+      bg.style.opacity = settings.opacity;
+      document.documentElement.classList.toggle("wpgl-on", settings.transparentUI !== false);
+    }
+    if (key === "fit" && inst) inst.setFit(settings.fit);
+    if (key === "fps" && inst) inst.setFps(Number(settings.fps));
+    if (key === "dpr" && inst) inst.setRenderDpr(Number(settings.dpr));
+  },
+  setProperty(name, value) { if (inst) inst.setProperties({ [name]: value }); },
+};
+
+let ui;
+(async () => {
+  const qp = new URLSearchParams(location.search);
+  if (qp.get("theme") === "light") document.documentElement.setAttribute("data-theme-mode", "light");
+  ui = window.__ui = WPUI.mount(ctrl);
+  const r = await fetch("/api/items");
+  items = await r.json();
+  ui.render();
+  const gaze = items.find((x) => x.type === "scene" && /Gaze/i.test(x.title)) || items.find((x) => x.type === "scene");
+  if (gaze) await mountItem(gaze);
+  if (qp.get("panel") !== "0") ui.open();
+  setInterval(() => ui.updateFps(inst && inst.stats ? inst.stats.fps : 0), 1000);
+  setTimeout(() => { window.__ready = true; }, 3000);
+})().catch((e) => { console.error(e); window.__err = String(e); window.__ready = true; });
+</script>
+</body>
+</html>

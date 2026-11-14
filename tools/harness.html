@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>WebWallGL harness</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d12; }
+  #stage { position: fixed; inset: 0; }
+  #log { position: fixed; left: 12px; bottom: 12px; z-index: 3; color: #7dffa8; font: 12px/1.5 Consolas, monospace; white-space: pre-wrap; text-shadow: 0 1px 2px #000; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="log"></div>
+<script src="/lib/webwallgl.global.min.js"></script>
+<script>
+  const logEl = document.getElementById("log");
+  function log(m) { logEl.textContent += m + "\n"; }
+  const q = new URLSearchParams(location.search);
+  const id = q.get("id");
+  const pkg = q.get("pkg") || "";
+  const file = q.get("file") || "";
+  const fit = q.get("fit") || "cover";
+  const t0 = performance.now();
+
+  (async () => {
+    const projectRes = await fetch(`/wp/${id}/project.json`);
+    const project = projectRes.ok ? await projectRes.json() : {};
+    let source;
+    if (pkg) {
+      const res = await fetch(`/wp/${id}/${encodeURIComponent(pkg)}`);
+      if (!res.ok) throw new Error("pkg fetch failed " + res.status);
+      const ab = await res.arrayBuffer();
+      log("pkg loaded " + (ab.byteLength / 1048576).toFixed(1) + " MB in " + Math.round(performance.now() - t0) + "ms");
+      source = WebWallGL.bytesSource(ab, project, id);
+    } else {
+      source = WebWallGL.mediaSource(`/wp/${id}/${encodeURIComponent(file)}`, { type: project.type || "video" });
+    }
+    const inst = await WebWallGL.mount(document.getElementById("stage"), {
+      source,
+      fit,
+      fps: 30,
+      renderDpr: 1.5,
+      autoplay: true,
+      volume: 0,
+      scripts: true,
+      mountTimeoutMs: 150000,
+      onDiagnostic: (m, lvl) => log(`[${lvl}] ${m}`),
+    });
+    window.__inst = inst;
+    log("mounted in " + Math.round(performance.now() - t0) + "ms");
+    log("info: " + JSON.stringify(inst.info));
+    setTimeout(() => { window.__ready = true; }, 2500);
+  })().catch((e) => {
+    log("ERR " + (e && e.message));
+    window.__err = String(e && e.message);
+    window.__ready = true;
+  });
+</script>
+</body>
+</html>

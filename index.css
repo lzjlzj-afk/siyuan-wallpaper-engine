@@ -1,0 +1,829 @@
+/*!
+ * 思源壁纸引擎 · 样式
+ * - #wpgl-bg 固定在最底层，承载 WebWallGL 画布
+ * - .wpgl-panel 壁纸库 / 外观 / 性能 / 关于 面板
+ * - .wpgl-on 时的思源界面透明化与毛玻璃
+ */
+
+/* ============================================================ 背景层 */
+
+#wpgl-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: #0b0d12;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+#wpgl-stage,
+#wpgl-stage > div,
+#wpgl-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+#wpgl-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%),
+    rgba(0, 0, 0, var(--wpgl-scrim, 0.25));
+  transition: background 0.2s ease;
+}
+
+#wpgl-bg.wpgl-loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #7fb2ff;
+  animation: wpgl-spin 0.9s linear infinite;
+}
+
+@keyframes wpgl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================ 思源透明化 */
+
+html.wpgl-on,
+html.wpgl-on body {
+  background: transparent !important;
+}
+
+html.wpgl-on #layouts,
+html.wpgl-on .layout,
+html.wpgl-on .layout__center,
+html.wpgl-on .layout-tab-container,
+html.wpgl-on .layout__wnd,
+html.wpgl-on .layout__wnd--active,
+html.wpgl-on .protyle,
+html.wpgl-on .protyle-content,
+html.wpgl-on .protyle-wysiwyg,
+html.wpgl-on .protyle-background,
+html.wpgl-on .protyle-title,
+html.wpgl-on .protyle-breadcrumb,
+html.wpgl-on .sy__file,
+html.wpgl-on .file-tree,
+html.wpgl-on .dockPanel,
+html.wpgl-on .layout__dockl,
+html.wpgl-on .layout__dockr,
+html.wpgl-on .layout__dockb {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.wpgl-on .toolbar,
+html.wpgl-on #dockLeft,
+html.wpgl-on #dockRight,
+html.wpgl-on #dockTop,
+html.wpgl-on #dockBottom,
+html.wpgl-on .layout-tab-bar,
+html.wpgl-on .layout__wnd--active .layout-tab-bar,
+html.wpgl-on .dock {
+  background: rgba(var(--wpgl-glass-rgb, 22, 25, 32), var(--wpgl-glass, 0.55)) !important;
+  -webkit-backdrop-filter: blur(var(--wpgl-blur, 18px)) saturate(1.35);
+  backdrop-filter: blur(var(--wpgl-blur, 18px)) saturate(1.35);
+}
+
+html.wpgl-on .b3-menu,
+html.wpgl-on .b3-dialog__container,
+html.wpgl-on .block__popover,
+html.wpgl-on .protyle-util {
+  background: rgba(var(--wpgl-glass-rgb, 22, 25, 32), min(0.94, calc(var(--wpgl-glass, 0.55) + 0.36))) !important;
+  -webkit-backdrop-filter: blur(calc(var(--wpgl-blur, 18px) * 1.4)) saturate(1.3);
+  backdrop-filter: blur(calc(var(--wpgl-blur, 18px) * 1.4)) saturate(1.3);
+}
+
+html.wpgl-on .protyle-wysiwyg [data-node-id].p,
+html.wpgl-on .b3-typography p {
+  border-radius: 10px;
+  background: rgba(var(--wpgl-glass-rgb, 22, 25, 32), 0.18);
+  box-shadow: none;
+}
+
+/* 编辑区衬底：给正文盖一层很薄的玻璃，保证任何壁纸上都能读 */
+html.wpgl-on .protyle {
+  background: rgba(var(--wpgl-glass-rgb, 22, 25, 32), var(--wpgl-veil, 0.28)) !important;
+  -webkit-backdrop-filter: blur(calc(var(--wpgl-blur, 18px) * 0.55)) saturate(1.15);
+  backdrop-filter: blur(calc(var(--wpgl-blur, 18px) * 0.55)) saturate(1.15);
+}
+
+html.wpgl-on .protyle-wysiwyg,
+html.wpgl-on .protyle-title,
+html.wpgl-on .protyle-breadcrumb,
+html.wpgl-on .b3-list-item__text,
+html.wpgl-on .dock,
+html.wpgl-on .toolbar {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+html.wpgl-on[data-theme-mode="light"] .protyle-wysiwyg,
+html.wpgl-on[data-theme-mode="light"] .protyle-title,
+html.wpgl-on[data-theme-mode="light"] .protyle-breadcrumb,
+html.wpgl-on[data-theme-mode="light"] .b3-list-item__text,
+html.wpgl-on[data-theme-mode="light"] .dock,
+html.wpgl-on[data-theme-mode="light"] .toolbar {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+}
+
+html.wpgl-on .protyle-wysiwyg [data-node-id].p:hover,
+html.wpgl-on .b3-typography p:hover {
+  background: rgba(var(--wpgl-glass-rgb, 22, 25, 32), 0.3);
+}
+
+html.wpgl-on .protyle-title__input,
+html.wpgl-on .protyle-title {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+
+html.wpgl-on[data-theme-mode="light"] .protyle-title__input,
+html.wpgl-on[data-theme-mode="light"] .protyle-title {
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.6);
+}
+
+/* 面板打开时轻微压暗思源本体，让面板更聚焦 */
+html.wpgl-on body.wpgl-panel-open #layouts {
+  filter: saturate(0.85) brightness(0.9);
+  transition: filter 0.2s ease;
+}
+
+/* ============================================================ 面板骨架 */
+
+.wpgl-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  color: #e9eef6;
+  opacity: 1;
+  transition: opacity 0.18s ease;
+}
+
+.wpgl-panel.wpgl-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wpgl-panel__mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 5, 9, 0.5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.wpgl-panel__win {
+  position: relative;
+  width: min(1140px, 94vw);
+  height: min(748px, 90vh);
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, rgba(30, 36, 48, 0.94), rgba(14, 17, 24, 0.96) 55%),
+    rgba(16, 19, 26, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 50px 140px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  backdrop-filter: blur(28px) saturate(1.3);
+}
+
+/* 头部 */
+
+.wpgl-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+  flex: 0 0 auto;
+}
+
+.wpgl-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #5b9dff, #63e6c0);
+  box-shadow: 0 4px 14px rgba(80, 150, 255, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.wpgl-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.wpgl-ver {
+  font-size: 11px;
+  color: #7e8a9c;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.wpgl-head__space {
+  flex: 1;
+}
+
+.wpgl-iconbtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #aab6c8;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wpgl-iconbtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* 主体 */
+
+.wpgl-main {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+.wpgl-nav {
+  width: 172px;
+  flex: 0 0 auto;
+  padding: 14px 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.wpgl-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #98a4b6;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.wpgl-nav__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #dbe4f0;
+}
+
+.wpgl-nav__item--active {
+  background: rgba(91, 157, 255, 0.16);
+  color: #eaf2ff;
+  box-shadow: inset 0 0 0 1px rgba(91, 157, 255, 0.3);
+}
+
+.wpgl-nav__ico {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.wpgl-nav__foot {
+  margin-top: auto;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #6f7a8b;
+}
+
+/* 内容区 */
+
+.wpgl-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wpgl-pane {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 18px 22px 22px;
+  display: none;
+}
+
+.wpgl-pane--active {
+  display: block;
+}
+
+.wpgl-pane::-webkit-scrollbar,
+.wpgl-grid::-webkit-scrollbar {
+  width: 10px;
+}
+
+.wpgl-pane::-webkit-scrollbar-thumb,
+.wpgl-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* 工具栏 */
+
+.wpgl-libbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.wpgl-search {
+  flex: 1 1 auto;
+  height: 36px;
+  padding: 0 12px 0 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%238b97a8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 11px center;
+  color: #eef3fa;
+  font-size: 13px;
+  outline: none;
+}
+
+.wpgl-search:focus {
+  border-color: rgba(91, 157, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(91, 157, 255, 0.14);
+}
+
+.wpgl-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  color: #dde6f2;
+  font-size: 12.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wpgl-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.wpgl-btn--primary {
+  border-color: rgba(91, 157, 255, 0.5);
+  background: linear-gradient(135deg, rgba(76, 139, 245, 0.95), rgba(64, 118, 224, 0.95));
+  color: #fff;
+}
+
+.wpgl-count {
+  font-size: 12px;
+  color: #7f8b9d;
+  white-space: nowrap;
+}
+
+/* 壁纸网格 */
+
+.wpgl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(208px, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.wpgl-card {
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.wpgl-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.wpgl-card--active {
+  border-color: rgba(91, 157, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(91, 157, 255, 0.6), 0 10px 30px rgba(52, 116, 235, 0.28);
+}
+
+.wpgl-card--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.wpgl-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #161b24, #0d1117);
+  overflow: hidden;
+}
+
+.wpgl-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wpgl-thumb__ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.18);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.wpgl-badge {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  line-height: 16px;
+  color: #dbe8ff;
+  background: rgba(8, 12, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.wpgl-badge--live {
+  color: #8be9c0;
+  border-color: rgba(99, 230, 192, 0.4);
+}
+
+.wpgl-card__meta {
+  padding: 9px 11px 11px;
+}
+
+.wpgl-card__title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e6edf7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wpgl-card__sub {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #7f8b9c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wpgl-empty {
+  padding: 64px 20px;
+  text-align: center;
+  color: #808c9e;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.wpgl-empty b {
+  color: #b9c5d6;
+}
+
+/* 设置行 */
+
+.wpgl-group {
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.wpgl-group__title {
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8492a6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wpgl-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.wpgl-row:last-child {
+  border-bottom: 0;
+}
+
+.wpgl-row__label {
+  flex: 0 0 150px;
+  font-size: 13px;
+  color: #cfd9e8;
+}
+
+.wpgl-row__desc {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #788496;
+  font-weight: 400;
+}
+
+.wpgl-row__ctrl {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.wpgl-row__val {
+  width: 46px;
+  text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #9fb0c6;
+}
+
+input[type="range"].wpgl-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+
+input[type="range"].wpgl-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7fb2ff, #63e6c0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  border: 0;
+}
+
+.wpgl-select {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6edf7;
+  font-size: 12.5px;
+  outline: none;
+  min-width: 150px;
+}
+
+.wpgl-select option {
+  background: #1a1f29;
+}
+
+.wpgl-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.wpgl-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wpgl-switch__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.wpgl-switch__track::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.18s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.wpgl-switch input:checked + .wpgl-switch__track {
+  background: linear-gradient(135deg, #4c8bf5, #4ed6b4);
+}
+
+.wpgl-switch input:checked + .wpgl-switch__track::after {
+  transform: translateX(18px);
+}
+
+/* 壁纸属性 */
+
+.wpgl-props {
+  margin-top: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  overflow: hidden;
+}
+
+.wpgl-props__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.wpgl-props__head b {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.wpgl-props__head span {
+  font-size: 11px;
+  color: #7f8b9d;
+}
+
+.wpgl-props__body {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: none;
+}
+
+.wpgl-props--open .wpgl-props__body {
+  display: block;
+}
+
+/* 底部状态栏 */
+
+.wpgl-foot {
+  flex: 0 0 auto;
+  height: 50px;
+  padding: 0 16px 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+  color: #8f9bad;
+}
+
+.wpgl-now {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wpgl-now b {
+  color: #dfe8f5;
+  font-weight: 600;
+}
+
+.wpgl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #63e6c0;
+  box-shadow: 0 0 8px rgba(99, 230, 192, 0.8);
+  flex: 0 0 auto;
+}
+
+.wpgl-dot--idle {
+  background: #6b7688;
+  box-shadow: none;
+}
+
+.wpgl-fps {
+  font-variant-numeric: tabular-nums;
+  color: #7f8b9d;
+  white-space: nowrap;
+}
+
+/* 关于页 */
+
+.wpgl-about h2 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.wpgl-about p {
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #a6b2c4;
+  margin: 0 0 10px;
+}
+
+.wpgl-about code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 11.5px;
+  color: #cfe0ff;
+}
+
+.wpgl-kv {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 6px 14px;
+  font-size: 12.5px;
+  color: #a6b2c4;
+  margin: 14px 0;
+}
+
+.wpgl-kv b {
+  color: #dfe8f5;
+  font-weight: 600;
+}
+
+.wpgl-tip {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 196, 87, 0.25);
+  background: rgba(255, 196, 87, 0.08);
+  color: #e8c98d;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+
+/* 窄屏 */
+
+@media (max-width: 860px) {
+  .wpgl-nav {
+    width: 132px;
+  }
+  .wpgl-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .wpgl-row__ctrl {
+    width: 100%;
+  }
+}
