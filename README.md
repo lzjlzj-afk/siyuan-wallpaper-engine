@@ -15,6 +15,8 @@ Scene wallpapers (`scene.pkg`) are rendered in real time with WebGL2 — layers,
 - **Video wallpapers**: streamed over a loopback HTTP server with Range requests; 4K / 200 MB+ works
 - **Web wallpapers**: local static server + iframe, relative assets included
 - **Wallpaper properties**: auto-generated controls from `project.json` `general.properties`
+
+![Wallpaper properties](docs/img/props.png)
 - **Liquid glass**: transparent UI, editor veil, blur radius, glass opacity, scrim, wallpaper opacity, fit mode
 - **Performance**: FPS cap, render DPR, live FPS, pause on blur
 - **Rotation**: random switch every 5 / 15 / 30 / 60 minutes
