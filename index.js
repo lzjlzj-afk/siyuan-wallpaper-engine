@@ -14,6 +14,7 @@ const DEFAULTS = {
   dpr: 1.5,
   opacity: 0.65,
   scrim: 0.25,
+  clearMode: false,
   blur: 18,
   glass: 0.55,
   veil: 0.28,
@@ -70,6 +71,10 @@ class WallpaperEnginePlugin extends Plugin {
       console.error("[wallpaper-engine] onload failed", err);
       showMessage(`壁纸引擎加载失败：${err && err.message ? err.message : err}`, 8000, "error");
     }
+  }
+
+  get version() {
+    return "0.2.0";
   }
 
   get serverUrl() {
@@ -203,6 +208,7 @@ class WallpaperEnginePlugin extends Plugin {
     this.bg.classList.add("wpgl-loading");
 
     this.destroyInstance();
+    this._hasFrame = false;
 
     try {
       const inst = await WPCore.Renderer.mount(this.stage, item, {
@@ -228,6 +234,7 @@ class WallpaperEnginePlugin extends Plugin {
         return;
       }
       this.instance = inst;
+      this._hasFrame = true;
       // 恢复这张壁纸上次调好的属性
       const savedProps = (this.settings.props && this.settings.props[id]) || null;
       if (savedProps && Object.keys(savedProps).length) {
@@ -308,18 +315,20 @@ class WallpaperEnginePlugin extends Plugin {
     const s = this.settings;
     const rootStyle = document.documentElement.style;
     const dark = document.documentElement.getAttribute("data-theme-mode") !== "light";
-    rootStyle.setProperty("--wpgl-scrim", String(s.scrim));
-    rootStyle.setProperty("--wpgl-blur", `${s.blur}px`);
-    rootStyle.setProperty("--wpgl-glass", String(s.glass));
-    rootStyle.setProperty("--wpgl-veil", String(s.veil));
+    const clear = s.clearMode === true;
+    rootStyle.setProperty("--wpgl-scrim", clear ? "0" : String(s.scrim));
+    rootStyle.setProperty("--wpgl-blur", clear ? "0px" : `${s.blur}px`);
+    rootStyle.setProperty("--wpgl-glass", clear ? "0" : String(s.glass));
+    rootStyle.setProperty("--wpgl-veil", clear ? "0" : String(s.veil));
     rootStyle.setProperty("--wpgl-glass-rgb", dark ? "22, 25, 32" : "255, 255, 255");
     document.documentElement.classList.toggle("wpgl-on", s.transparentUI !== false);
-    if (this.bg) this.bg.style.opacity = String(s.opacity);
+    document.documentElement.classList.toggle("wpgl-clear", clear);
+    if (this.bg) this.bg.style.opacity = clear ? "1" : String(s.opacity);
   }
 
   applySettings(key) {
     const s = this.settings;
-    if (["opacity", "scrim", "blur", "glass", "veil", "transparentUI"].includes(key)) {
+    if (["opacity", "scrim", "blur", "glass", "veil", "clearMode", "transparentUI"].includes(key)) {
       this.applyLook();
     }
     if (key === "fit" && this.instance) this.instance.setFit(s.fit);
@@ -349,7 +358,7 @@ class WallpaperEnginePlugin extends Plugin {
 
   bindEvents() {
     this._onBlur = () => {
-      if (this.settings.pauseOnBlur !== false && this.instance && !this.paused) {
+      if (this.settings.pauseOnBlur !== false && this.instance && this._hasFrame && !this.paused) {
         this.instance.pause();
         this._autoPaused = true;
       }

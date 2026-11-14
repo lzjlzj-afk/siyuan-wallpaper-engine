@@ -156,6 +156,30 @@ html.wpgl-on[data-theme-mode="light"] .protyle-title {
   text-shadow: 0 1px 10px rgba(255, 255, 255, 0.6);
 }
 
+/* 全透明模式：去掉所有底色与背景滤镜，壁纸 100% 透出 */
+html.wpgl-clear #wpgl-scrim {
+  display: none;
+}
+
+html.wpgl-clear .toolbar,
+html.wpgl-clear #dockLeft,
+html.wpgl-clear #dockRight,
+html.wpgl-clear #dockTop,
+html.wpgl-clear #dockBottom,
+html.wpgl-clear .layout-tab-bar,
+html.wpgl-clear .layout__wnd--active .layout-tab-bar,
+html.wpgl-clear .dock,
+html.wpgl-clear .protyle {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.wpgl-clear .protyle-wysiwyg [data-node-id].p,
+html.wpgl-clear .b3-typography p {
+  background: transparent !important;
+}
+
 /* 面板打开时轻微压暗思源本体，让面板更聚焦 */
 html.wpgl-on body.wpgl-panel-open #layouts {
   filter: saturate(0.85) brightness(0.9);

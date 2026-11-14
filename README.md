@@ -18,6 +18,7 @@ Scene wallpapers (`scene.pkg`) are rendered in real time with WebGL2 — layers,
 
 ![Wallpaper properties](docs/img/props.png)
 - **Liquid glass**: transparent UI, editor veil, blur radius, glass opacity, scrim, wallpaper opacity, fit mode
+- **Full-transparent mode**: one switch to show the wallpaper at 100% with no scrim, veil, tint or background blur
 - **Performance**: FPS cap, render DPR, live FPS, pause on blur
 - **Rotation**: random switch every 5 / 15 / 30 / 60 minutes
 - **Persistence**: remembers the last wallpaper and per-wallpaper properties
